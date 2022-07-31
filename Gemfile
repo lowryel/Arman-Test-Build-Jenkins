@@ -1,10 +1,10 @@
 # fastlane/Fastfile
 # default_platform :ios
 
-platform :ios do
+platform :ios #do
 #   before_all do
-    setup_circle_ci
-  end
+#     setup_circle_ci
+#   end
 
   desc "Runs all the tests"
   lane :test do
