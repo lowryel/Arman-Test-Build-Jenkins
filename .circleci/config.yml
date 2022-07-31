@@ -1,79 +1,37 @@
 # https://circleci.com/docs/2.0/testing-ios/
 version: 2.1
 
-# Define a job to be invoked later in a workflow.
-# See: https://circleci.com/docs/2.0/configuration-reference/#jobs
-
-jobs:
-  build-and-test:
+jobs: # a basic unit of work in a run
+  test: # your job name
     macos:
-      xcode: 12.5.1
-    environment:
-      FL_OUTPUT_DIR: output
-      FASTLANE_LANE: test
+      xcode: 12.5.1 # indicate your selected version of Xcode
+    steps: # a series of commands to run
+      - checkout  # pull down code from your version control system.
+      - run:
+          name: Run Unit Tests
+          command: xcodebuild test -scheme circleci-demo-macos
+
+  build:
+    macos:
+      xcode: 12.5.1 # indicate your selected version of Xcode
     steps:
       - checkout
-      - run: bundle install
       - run:
-          name: Fastlane
-          command: bundle exec fastlane test
-      - store_artifacts:
-          path: output
-      - store_test_results:
-          path: output/scan
-
-  adhoc:
-    macos:
-      xcode: 12.5.1
-    environment:
-      FL_OUTPUT_DIR: output
-      FASTLANE_LANE: adhoc
-    steps:
-      - checkout
-      - run: bundle install
+          # build our application
+          name: Build Application
+          command: xcodebuild
       - run:
-          name: Fastlane
-          command: bundle exec fastlane adhoc
-      - store_artifacts:
-          path: output
+          # compress Xcode's build output so that it can be stored as an artifact
+          name: Compress app for storage
+          command: zip -r app.zip build/Release/circleci-demo-macos.app
+      - store_artifacts: # store this build output. Read more: https://circleci.com/docs/artifacts/
+          path: app.zip
+          destination: app
 
 workflows:
-  build-test-adhoc:
+  test_build:
     jobs:
-      - build-and-test
-      - adhoc:
-          filters:
-            branches:
-              only: development
-          requires:
-            - build-and-test
-
-  # build-and-test-ios:
-  #   macos:
-  #     xcode: 12.5.1 # Specify the Xcode version to use
-      
-  #   working_directory: /Users/distiller/project
-  #   environment:
-  #     FL_OUTPUT_DIR: output
-  #     FASTLANE_LANE: test
-  #   shell: /bin/bash --login -o pipefail
-  #   steps:
-  #     - checkout
-  #     - run: bundle install
-  #     - run:
-  #         name: Fastlane
-  #         command: bundle exec fastlane $FASTLANE_LANE
-  #     - store_artifacts:
-  #         path: output
-  #     - store_test_results:
-  #         path: output/scan
-
-
-      # Collect XML test results data to show in the UI, and save the same XML
-      # files under test-results folder in the Artifacts tab
-      # - store_test_results:
-      #     path: test_output
-      # - store_artifacts:
-      #     path: test_output
-      #     destination: scan-output
-
+      - test
+      - build:
+        requires: # sequence the build job to run after test
+          test
