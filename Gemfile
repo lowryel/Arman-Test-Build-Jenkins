@@ -1,5 +1,5 @@
 # fastlane/Fastfile
-default_platform :ios
+# default_platform :ios
 
 platform :ios do
   before_all do
