@@ -30,7 +30,7 @@ jobs:
     steps:
       - checkout
       - run: sudo gem install fastlane # install fastlane gem
-      - run: fastlane init # Install CocoaPods dependencies
+      # - run: fastlane init # Install CocoaPods dependencies
       - run: fastlane scan # Run tests using Fastlane
       - run:
           name: running fastlane beta
