@@ -1,54 +1,79 @@
-# Use the latest 2.1 version of CircleCI pipeline process engine.
-# See: https://circleci.com/docs/2.0/configuration-reference
-# For a detailed guide to building and testing on iOS, read the docs:
 # https://circleci.com/docs/2.0/testing-ios/
 version: 2.1
 
 # Define a job to be invoked later in a workflow.
 # See: https://circleci.com/docs/2.0/configuration-reference/#jobs
+
 jobs:
   build-and-test:
     macos:
       xcode: 12.5.1
+    environment:
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: test
     steps:
       - checkout
+      - run: bundle install
       - run:
-          name: Run tests
-          command: fastlane scan
-          environment:
-            SCAN_DEVICE: iPhone 6
-            SCAN_SCHEME: WebTests
+          name: Fastlane
+          command: bundle exec fastlane $FASTLANE_LANE
+      - store_artifacts:
+          path: output
+      - store_test_results:
+          path: output/scan
 
-  build:
-    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
-    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+  adhoc:
     macos:
-      xcode: 12.5.1 # Specify the Xcode version to use
-
-    # Add steps to the job
-    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+      xcode: 12.5.1
+    environment:
+      FL_OUTPUT_DIR: output
+      FASTLANE_LANE: adhoc
     steps:
       - checkout
-      - run: sudo gem install fastlane # install fastlane gem
-      # - run: fastlane init # Install CocoaPods dependencies
-      - run: fastlane scan # Run tests using Fastlane
+      - run: bundle install
       - run:
-          name: running fastlane beta
-          command: fastlane ios beta # Run beta build
-          environment:
-            SCAN_DEVICE: iPhone 6
-            SCAN_SCHEME: WebTests
+          name: Fastlane
+          command: bundle exec fastlane $FASTLANE_LANE
+      - store_artifacts:
+          path: output
+
+workflows:
+  build-test-adhoc:
+    jobs:
+      - build-and-test
+      - adhoc:
+          filters:
+            branches:
+              only: development
+          requires:
+            - build-and-test
+
+  # build-and-test-ios:
+  #   macos:
+  #     xcode: 12.5.1 # Specify the Xcode version to use
+      
+  #   working_directory: /Users/distiller/project
+  #   environment:
+  #     FL_OUTPUT_DIR: output
+  #     FASTLANE_LANE: test
+  #   shell: /bin/bash --login -o pipefail
+  #   steps:
+  #     - checkout
+  #     - run: bundle install
+  #     - run:
+  #         name: Fastlane
+  #         command: bundle exec fastlane $FASTLANE_LANE
+  #     - store_artifacts:
+  #         path: output
+  #     - store_test_results:
+  #         path: output/scan
+
 
       # Collect XML test results data to show in the UI, and save the same XML
       # files under test-results folder in the Artifacts tab
-      - store_test_results:
-          path: test_output
-      - store_artifacts:
-          path: test_output
-          destination: scan-output
-
-workflows:
-  my_workflow:
-    jobs:
-      - build
+      # - store_test_results:
+      #     path: test_output
+      # - store_artifacts:
+      #     path: test_output
+      #     destination: scan-output
 
