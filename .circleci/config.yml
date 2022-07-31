@@ -2,36 +2,19 @@
 version: 2.1
 
 jobs: # a basic unit of work in a run
-  test: # your job name
+  build-and-test: # your job name
     macos:
       xcode: 12.5.1 # indicate your selected version of Xcode
     steps: # a series of commands to run
       - checkout  # pull down code from your version control system.
       - run:
-          name: Run Unit Tests
-          command: xcodebuild test -scheme circleci-demo-macos
-
-  build:
-    macos:
-      xcode: 12.5.1 # indicate your selected version of Xcode
-    steps:
-      - checkout
-      - run:
-          # build our application
-          name: Build Application
-          command: xcodebuild
-      - run:
-          # compress Xcode's build output so that it can be stored as an artifact
-          name: Compress app for storage
-          command: zip -r app.zip build/Release/circleci-demo-macos.app
-      - store_artifacts: # store this build output. Read more: https://circleci.com/docs/artifacts/
-          path: app.zip
-          destination: app
+          name: install and run fastlane
+          command: 
+            brew install fastlane
+            fastlane ios
 
 workflows:
   test_build:
     jobs:
-      - test
-      - build:
-          requires: # sequence the build job to run after test
-            - test
+      - build-and-test
+
