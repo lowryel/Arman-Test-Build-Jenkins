@@ -366,7 +366,7 @@ DEPENDENCIES
   danger (~> 8.0)
   danger-junit (~> 1.0)
   fakefs (~> 1.2)
-  fastlane!
+  fastlane (~> 2.82)
   fastlane-plugin-clubmate
   fastlane-plugin-ruby
   fastlane-plugin-slack_train (>= 0.2.0)
