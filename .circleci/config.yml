@@ -14,9 +14,9 @@ jobs:
     shell: /bin/bash --login -o pipefail
     steps:
       - checkout
-      # - run: xcode-select --install
+      - run: brew install fastlane
       - ruby/install-deps
-      - run: bundle install && bundle update
+      - run: bundle update
       - run:
           name: fastlane
           command: |
