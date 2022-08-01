@@ -15,6 +15,7 @@ jobs:
     steps:
       - checkout
       - ruby/install-deps
+      - run: bundle install && bundle update
       - run:
           name: fastlane
           command: |
@@ -27,7 +28,6 @@ jobs:
           name: install and run fastlane
           command: |
             brew install fastlane
-            gem install bundler && bundle update
 
 workflows:
   build-and-test:
