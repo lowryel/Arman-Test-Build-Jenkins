@@ -14,7 +14,7 @@ jobs:
     shell: /bin/bash --login -o pipefail
     steps:
       - checkout
-      - run: xcode-select --install
+      # - run: xcode-select --install
       - ruby/install-deps
       - run: bundle install && bundle update
       - run:
